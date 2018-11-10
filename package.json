@@ -1,0 +1,39 @@
+{
+  "name": "bitdef",
+  "version": "1.0.0",
+  "description": "a language to generate typescript code to parse binary file formats",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json",
+    "prepare" : "npm run build",
+    "prepublishOnly" : "npm run lint",
+    "preversion" : "npm run lint",
+    "version" : "npm run format && git add -A src",
+    "postversion" : "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dar2355/bitdef.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dar2355/bitdef/issues"
+  },
+  "homepage": "https://github.com/dar2355/bitdef#readme",
+  "devDependencies": {
+    "@types/moo": "^0.4.2",
+    "prettier": "^1.15.2",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0",
+    "typescript": "^3.1.6"
+  },
+  "dependencies": {
+    "moo": "^0.5.0"
+  }
+}
