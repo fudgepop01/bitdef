@@ -9,11 +9,11 @@
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
-    "prepare" : "npm run build",
-    "prepublishOnly" : "npm run lint",
-    "preversion" : "npm run lint",
-    "version" : "npm run format && git add -A src",
-    "postversion" : "git push && git push --tags"
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
@@ -28,12 +28,14 @@
   "homepage": "https://github.com/dar2355/bitdef#readme",
   "devDependencies": {
     "@types/moo": "^0.4.2",
+    "@types/node": "^10.12.5",
     "prettier": "^1.15.2",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
     "typescript": "^3.1.6"
   },
   "dependencies": {
+    "bignumber.js": "^8.0.1",
     "moo": "^0.5.0"
   }
 }
