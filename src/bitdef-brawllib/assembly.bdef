@@ -1,0 +1,154 @@
+enum PPCMnemonic {
+  0x00000000: base_op
+  0x00000000: word
+  0x0C000000: twi
+  0x10000000: vaddubm
+  0x1C000000: mulli
+  0x20000000: subfic
+  0x28000000: cmpli
+  0x2C000000: cmpi
+  0x30000000: addic
+  0x34000000: addic_D
+  0x38000000: addi
+  0x3C000000: addis
+
+  0x40000000: bc
+  0x40000002: bca
+  0x40000001: bcl
+  0x40000003: bcla
+
+  0x48000000: b
+  0x48000002: ba
+  0x48000001: bl
+  0x48000003: bla
+
+  0x4C000000: grp4C
+
+  0x4C000000: mcrf
+  0x4C000020: bclr
+  0x4C000042: crnor
+  0x4C000064: rfi
+  0x4C000102: crandc
+  0x4C00012C: isync
+  0x4C000182: crxor
+  0x4C000202: crand
+  0x4C0001C2: crnand
+  0x4C000242: creqv
+  0x4C000342: crorc
+  0x4C000382: cror
+  0x4C000420: bcctr
+
+  0x50000000: rlwimi
+  0x50000001: rlwimi_D
+
+  0x54000000: rlwinm
+  0x54000001: rlwinm_D
+
+  0x5C000000: rlwnm
+  0x5C000001: rlwnm_D
+
+  0x60000000: ori
+  0x64000000: oris
+  0x68000000: xori
+  0x6C000000: xoris
+  0x70000000: andi_D
+  0x74000000: andis_D
+  0x78000000: rldicl
+
+  0x7C000000: grp7C
+
+  0x7C000000: cmp
+  0x7C000008: tw
+  0x7C000010: subfc
+  0x7C000011: subfc_D
+  0x7C000014: addc
+  0x7C000015: addc_D
+  0x7C000016: mulhwu
+  0x7C000017: mulhwu_D
+  0x7C000096: mulhw
+  0x7C000097: mulhw_D
+  0x7C000023: mfcr
+  0x7C000028: lwarx
+  0x7C00002E: lwzx
+  0x7C000030: slw
+  0x7C000031: slw_D
+  0x7C000034: cntlzw
+  0x7C000035: cntlzw_D
+  0x7C000040: cmplw
+  0x7C000050: sub
+  0x7C000074: cntlzd
+  0x7C000194: addze
+  0x7C0001D4: addme
+  0x7C0001D6: mullw
+  0x7C000214: add
+  0x7C000215: add_D
+  0x7C000000: dcbt
+  0x7C000000: lhzx
+  0x7C000000: eqv
+  0x7C000000: eqv_D
+  0x7C000000: tlbie
+  0x7C000000: eciwx
+  0x7C000000: lhzux
+  0x7C000278: xor
+  0x7C000279: xor_D
+  0x7C0002A6: mfspr
+  0x7C000000: lhax
+  0x7C000378: or
+  0x7C000379: or_D
+  0x7C0003A6: mtspr
+  0x7C000000: addmeo
+  0x7C000000: addmeo_D
+  0x7C000000: mullwo
+  0x7C000000: mullwo_D
+  0x7C000000: dcba
+  0x7C000000: stfdux
+  0x7C000000: addo
+  0x7C000000: addo_D
+  0x7C000000: lhbrx
+  0x7C000630: sraw
+  0x7C000631: sraw_D
+  0x7C000670: srawi
+  0x7C000671: srawi_D
+  0x7C0006AC: eieio // oald mcdonald had a faaaaaaaaaaauuurm
+  0x7C00072C: sthbrx
+  0x7C000734: extsh
+  0x7C000735: extsh_D
+  0x7C000774: extsb
+  0x7C000775: extsb_D
+  0x7C000000: divwuo
+  0x7C000000: divwuo_D
+  0x7C000000: icbi
+  0x7C000000: stfiwx
+  0x7C000000: divwo
+  0x7C000000: divwo_D
+  0x7C000000: dcbz
+
+  0x80000000: lwz
+  0x84000000: lwzu
+  0x88000000: lbz
+  0x8C000000: lbzu
+  0x90000000: stw
+  0x94000000: stwu
+  0x98000000: stb
+  0x9C000000: stbu
+  0xA0000000: lhz
+  0xA4000000: lhzu
+  0xA8000000: lha
+  0xAC000000: lhau
+  0xB0000000: sth
+  0xB4000000: sthu
+  0xB8000000: lmw
+  0xBC000000: stmw
+  0xC0000000: lfs
+  0xC4000000: lfsu
+  0xC8000000: lfd
+  0xCC000000: lfdu
+  0xD0000000: stfs
+  0xD4000000: stfsu
+  0xD8000000: stfd
+  0xDC000000: stfdu
+  0xE8000000: ld
+  0xF8000000: std
+  0xFC000000: fcmpu
+}
+

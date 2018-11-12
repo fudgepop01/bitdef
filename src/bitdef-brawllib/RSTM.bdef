@@ -1,0 +1,30 @@
+# import './common.bdef'
+
+struct RSTMHeader {
+  NW4RCommonHeader header
+  i32b headOffset
+  i32b headLength
+  i32b adpcOffset
+  i32b adpcLength
+  i32b dataOffset
+  i32b dataLength
+}
+
+struct HEADHeader {
+  u32b tag
+  i32b size
+  ruint entries[3]
+
+get:
+  StrmDataInfo Part1 { ret entries[0] }
+  ruint Part2 { ret entries[1] }
+  ruint Part3 { ret entries[2] }
+  ADPCMInfo[] ChannelInfo {
+    
+  }
+}
+
+struct RSTM {
+  RSTMHeader header
+}
+

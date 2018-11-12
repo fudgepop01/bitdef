@@ -1,0 +1,29 @@
+enum Endian {
+  0xFEFF: Big
+  0xFFFE: Little
+}
+
+enum RefType {
+  0: Address
+  1: Offset
+}
+
+struct BinTag {
+  char[4] tag
+}
+
+struct ruint {
+  i8 (RefType) refType
+  i8 dataType
+  u16b reserved
+  i32b dataOffset
+}
+
+struct NW4RCommonHeader {
+  BinTag tag
+  u16b (Endian) endian
+  u16b version
+  i32b length
+  u16b firstOffset
+  u16b numEntries
+}
