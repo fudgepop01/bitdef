@@ -70,11 +70,12 @@ export class TypeNode {
 
   // protected bitfield(size: number) { return new bitfield(this.buffer.slice(), this) }
 
+  
   /**
    * automatically called when a node has finished being initialized
    */
   protected finalize() {
-
+    this.buffer.slice(0, this.progress);
   }
 
   /**
@@ -83,11 +84,13 @@ export class TypeNode {
    */
   public incProgress(amount: number) {
     this.progress += amount;
+    if (this.parent) this.parent.incProgress(amount);
   }
   public incBit(amount: number) {
-    this.
     this.bits += amount;
     this.bits %= 8;
+
+    if (this.parent) this.parent.incBit(amount);
   }
 }
 

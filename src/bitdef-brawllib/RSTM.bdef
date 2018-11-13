@@ -20,7 +20,7 @@ get:
   ruint Part2 { ret entries[1] }
   ruint Part3 { ret entries[2] }
   ADPCMInfo[] ChannelInfo {
-    
+
   }
 }
 
