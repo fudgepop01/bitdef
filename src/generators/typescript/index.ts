@@ -96,7 +96,7 @@ export class TypeNode {
   }
 }
 
-export type RawTypes = 'str' | 'dec' | 'flt' | 'ptr' | 'bit';
+export type RawTypes = 'str' | 'dec' | 'flt' | 'ptr' | 'off' | 'bit';
 export type byteValues = 1 | 2 | 3 | 4 | 6 | 8 | 16 | 32 | 64 | 128 | 256 | 512;
 export type bitValues =
   1  | 2  | 3  | 4  | 5  | 6  | 7  | 8  | 9  |
@@ -109,37 +109,39 @@ export interface IRawTypeArgs {
   buffer: Buffer;
   parent: TypeNode;
   kind: RawTypes;
-  bits: bitValues;
   endian: 'b' | 'l';
+  signed: boolean;
+  position: number;
 }
 
 export interface IRawTypeChange {
   bytes?: byteValues;
-  buffer?: Buffer;
-  parent?: TypeNode;
   kind?: RawTypes;
-  bits?: bitValues;
   endian?: 'b' | 'l';
+  signed?: boolean;
 }
 
 export class RawType {
-  public bytes: byteValues;
-  public bits: bitValues;
-  public endian: 'b' | 'l';
-  public buffer: Buffer;
-  public array?: number[];
-  public kind: RawTypes;
-  public parent: TypeNode;
-  public child?: TypeNode;
-  constructor({bytes, kind, buffer, parent, bits, endian}: IRawTypeArgs) {
+  protected bytes: byteValues;
+  protected endian: 'b' | 'l';
+  protected buffer: Buffer;
+  protected array?: number[];
+  protected kind: RawTypes;
+  protected parent: TypeNode;
+  protected signed: boolean;
+  protected child?: TypeNode | RawType;
+  protected position: number;
+  constructor({bytes, kind, buffer, parent, endian, signed, position}: IRawTypeArgs) {
     this.bytes = bytes;
     this.kind = kind;
     this.buffer = buffer;
     this.parent = parent;
-    this.bits = bits;
     this.endian = endian;
+    this.signed = signed;
+    this.position = position;
   }
 
+  // #region getters
   toString(): string {
     let out = '';
     for (const num of (this.array) ? this.array : [...this.buffer]) {
@@ -151,14 +153,13 @@ export class RawType {
 
   toFloat(size: number): string {
     let fullBin = '';
-    let exponentBitCount: number;
+    let exponentBitCount;
     switch(size) {
-      case 2: exponentBitCount = 5; break;
-      case 4: exponentBitCount = 8; break;
-      case 8: exponentBitCount = 11; break;
-      case 16: exponentBitCount = 15; break;
-      case 32: exponentBitCount = 19; break;
-
+      case 16: exponentBitCount = 5; break;
+      case 32: exponentBitCount = 8; break;
+      case 64: exponentBitCount = 11; break;
+      // case 128: exponentBitCount = 15; break;
+      // case 256: exponentBitCount = 19; break;
       default:
         return "NA"
     }
@@ -201,20 +202,156 @@ export class RawType {
     if (this.buffer.length > 4) return new BI(this.toHex(), 2).toString(10);
     else return parseInt(this.toHex()).toString(10);
   }
+  // #endregion
 
-  get value(): string {
+  // #region setters
+
+  /**
+   * creates a new array containing the characters specified
+   * @param str the string to add
+   */
+  setString(str: string): void {
+    if (!this.array) this.array = [...this.buffer];
+    this.array = [];
+    for (const char of str.split('')) {
+      const code = char.charCodeAt(0);
+      if (31 < code && code < 127) this.array.push(code);
+    }
+  }
+
+  /**
+   * creates a new array containing the hexidecimal values specified.
+   * this can be any length
+   * @param str the hexidecimal string of values that will be added
+   */
+  setStringHEX(str: string): void {
+    if (!this.array) this.array = [...this.buffer];
+    this.array = [];
+    for (const char of str.match(/.{1,2}/)!) {
+      const code = char.charCodeAt(0);
+      if (31 < code && code < 127) this.array.push(code);
+    }
+  }
+
+  /**
+   * converts the input to a floating point number.
+   * only supports 16, 32, 64, 128, and 256-bit numbers.
+   * Well, it would, if javascript also went up to 256 bits
+   * for its floats.
+   * (IEEE-754 standard)
+   * @param value what number to set / round it to
+   * @param size the number of bytes it takes
+   */
+  setFloat(value: number, size: number): void {
+    let exponentBitCount;
+    switch(size) {
+      case 16: exponentBitCount = 5; break;
+      case 32: exponentBitCount = 8; break;
+      case 64: exponentBitCount = 11; break;
+      //case 128: exponentBitCount = 15; break;
+      //case 256: exponentBitCount = 19; break;
+      default:
+        return;
+    }
+
+    let sign = (value < 0) ? 1 : 0;
+
+    value = Math.abs(value);
+
+    let fullNum = Math.floor(value);
+    let decimal = value - fullNum;
+    let decMantissaLimit = (size - 1 - exponentBitCount) - fullNum.toString(2).length + 3;
+    let decMantissa = '';
+
+    for (let i = 0; i < decMantissaLimit; i ++) {
+      decimal *= 2;
+      decMantissa += Math.floor(decimal);
+      if (decimal >= 1) decimal -= 1;
+    }
+
+    let rounding = decMantissa.substring(decMantissa.length - 2);
+    decMantissa = decMantissa.substring(0, decMantissa.length - 2);
+    if (rounding.charAt(0) === '1') {
+      decMantissa = (parseInt(decMantissa, 2) + 1).toString(2);
+      if (/10+$/.test(decMantissa)) {
+        fullNum += 1;
+        decMantissa = '';
+      }
+    }
+    let exponent = fullNum.toString(2).length - 1 + (Math.pow(2, exponentBitCount) / 2 - 1);
+    if (fullNum === 0) {
+      if (decMantissa === '') exponent = 0;
+      else exponent = (Math.pow(2, exponentBitCount) / 2 - 1) - decMantissa.match(/^(0*)/)![0].length - 1;
+    }
+    let expBin = exponent.toString(2).padStart(exponentBitCount, '0');
+
+    let fullBin = sign +
+    expBin +
+    (fullNum.toString(2) + decMantissa).padEnd((size - 1 - exponentBitCount) - fullNum.toString(2).length, '0').substring(1);
+
+    this.array = [];
+    for (let i = 0; i < size; i += 8) {
+      this.array.push(parseInt(fullBin.substring(i, i+8), 2));
+    }
+
+    if (this.endian === 'l') this.array = this.array.reverse();
+  }
+  // #endregion
+
+  get value(): string | number {
     switch(this.kind) {
       case 'dec': return this.toDecimal();
       case 'flt': return this.toFloat(this.bytes);
       case 'ptr': return this.toDecimal();
+      case 'off': return this.toDecimal();
       case 'str': return this.toString();
       case 'bit': return this.toBinary();
       default: return 'NA';
     }
   }
 
-  set params({bytes, kind, buffer, parent, bits, endian}: IRawTypeChange) {
-    if (!this.array) this.array = [...this.buffer];
-    if (bytes !== this.bytes) this.bytes
+  set value(newValue: string | number) {
+    switch(this.kind) {
+      case 'dec':
+    }
   }
+
+  set params({bytes, kind, endian, signed}: IRawTypeChange) {
+    if (!this.array) this.array = [...this.buffer];
+    let { array } = this;
+
+    if (bytes && bytes !== this.bytes) {
+      while (array.length !== bytes) {
+        if (array.length > bytes) {
+          switch(this.endian) {
+            case 'b': array.shift(); break;
+            case 'l': array.pop(); break;
+          }
+        } else {
+          switch(this.endian) {
+            case 'b': array.unshift(0); break;
+            case 'l': array.push(0); break;
+          }
+        }
+      }
+    }
+
+    if (kind && kind !== this.kind) {
+      this.kind = kind;
+    }
+
+    if (endian && endian !== this.endian) {
+      this.endian = endian;
+      array = array.reverse();
+    }
+
+    if (signed && signed !== this.signed) {
+      this.signed = signed;
+    }
+  }
+}
+
+export class bitField {
+  protected position: number;
+  protected fields: string[];
 }
