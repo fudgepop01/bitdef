@@ -31,7 +31,7 @@ const consolidate = async (path: string) => {
 
 
 const generate = async () => {
-  let input = await consolidate(`${__dirname}/bitdef-brawllib/RSTM.bdef`);
+  let input = await consolidate(`${__dirname}/bitdef-tests/firstPass.bdef`);
 
   const mainOut: string = await readFile(`${__dirname}/generators/typescript/index.ts`, 'utf8');
 

@@ -1,0 +1,75 @@
+enum Compression {
+  0:  none
+  1:  shrunk
+  2:  reduced_1
+  3:  reduced_2
+  4:  reduced_3
+  5:  reduced_4
+  6:  imploded
+  8:  deflated
+  9:  enhanced_deflated
+  10: pkware_dcl_imploded
+  12: bzip2
+  14: lzma
+  18: ibm_terse
+  19: ibm_lz77_z
+  98: ppmd // lol ppmd
+}
+
+enum ExtraCodes {
+  0x0001: zip64
+  0x0007: av_info
+  0x0009: os2
+  0x000a: ntfs
+  0x000c: openvms
+  0x000d: pkware_unix
+  0x000e: file_stream_and_fork_descriptors
+  0x000f: patch_descriptor
+  0x0014: pkcs7
+  0x0015: x509_cert_id_and_signature_for_file
+  0x0016: x509_cert_id_for_central_dir
+  0x0017: strong_encryption_header
+  0x0018: record_management_controls
+  0x0019: pkcs7_enc_recip_cert_list
+  0x0065: ibm_s390_uncomp
+  0x0066: ibm_s390_comp
+  0x4690: poszip_4690
+  0x5455: extended_timestamp
+  0x7855: infozip_unix
+  0x7875: infozip_unix_var_size
+}
+
+
+struct LocalFileHeader {
+  u16l version
+  u16l flags
+  u16l (Compression) compressionMethod
+  u16l fileModTime
+  u16l fileModDate
+  u32l crc32
+  u32l compressedSize
+  u32l uncompressedSize
+  u16l fileNameLength
+  u16l extraLength
+  char[fileNameLength] fileNamexexs
+}
+
+struct LocalFile {
+  LocalFileHeader header
+  # sized: header.compressedSize body
+}
+
+struct PkSection {
+  # magic: "PK"
+  u16l sectionType
+  switch (sectionType) {
+    0x0201: 0x0201: central_dir_entry
+    0x0403: local_file
+    0x0605: end_of_central_dir
+  } body
+
+}
+
+struct Section {
+
+}
