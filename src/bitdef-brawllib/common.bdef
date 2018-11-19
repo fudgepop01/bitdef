@@ -8,18 +8,18 @@ enum RefType {
   1: Offset
 }
 
-struct BinTag {
+seq BinTag {
   char[4] tag
 }
 
-struct ruint {
+seq ruint {
   i8 (RefType) refType
   i8 dataType
   u16b reserved
   i32b dataOffset
 }
 
-struct NW4RCommonHeader {
+seq NW4RCommonHeader {
   BinTag tag
   u16b (Endian) endian
   u16b version

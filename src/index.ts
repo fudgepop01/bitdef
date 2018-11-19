@@ -48,7 +48,7 @@ const generate = async () => {
     bitfield: /b[1-8]/,
     float: /f(?:16|32|64|128)[bl]/,
     char: 'char',
-    keywords: ['struct', 'enum', 'get', 'set', 'ref'],
+    keywords: ['seq', 'enum', 'get', 'set', 'ref'],
     NL: { match: /\n/, lineBreaks: true, value(str) {return '\\n'} },
     identifier: /[A-Za-z_]+[0-9A-Za-z_]*/
   });

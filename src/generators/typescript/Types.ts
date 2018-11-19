@@ -1,5 +1,6 @@
 import { BigInteger as BI, BigInteger } from "jsbn";
 import { TypeNode } from './TypeNode';
+import { NodeFactory, TypeNodes } from "./NodeFactory";
 
 export type RawTypes = 'str' | 'dec' | 'flt' ;
 export type byteValues = 8 | 16 | 32 | 64 | 128 | 256 | 512;
@@ -25,6 +26,13 @@ export interface IRawTypeChange {
   signed?: boolean;
 }
 
+/**
+ * a basic type container. can be string,
+ * integer, or float
+ *
+ * @export
+ * @class RawType
+ */
 export class RawType {
   protected endian: Endian;
   protected buffer: Buffer;
@@ -314,14 +322,66 @@ export class RawType {
   // #endregion
 }
 
-export class BitField {
-  protected position: number;
-  protected fields: string[];
-
-
+export interface IBitFieldArgs {
+  parent: TypeNode;
+  position: number;
+  subPosition: number;
+  bitCount: number;
+  chunk: number[];
 }
 
+/**
+ * part of a field of individual bits with
+ * varying lengths
+ *
+ * @export
+ * @class BitField
+ */
+export class BitField {
+  protected position: number;
+  protected subPosition: number;
+  protected parent: TypeNode;
+  protected bitCount: number;
+  protected chunk: number[];
+  protected value: number;
+
+  constructor({parent, position, subPosition, bitCount, chunk}: IBitFieldArgs) {
+    this.parent = parent;
+    this.position = position;
+    this.subPosition = subPosition;
+    this.bitCount = bitCount;
+    this.chunk = chunk;
+
+    let allBits = this.chunk.map(num => num.toString(2).padStart(8, '0')).join('');
+    let mask = (new Array(this.subPosition).fill('0').join('') + new Array(this.bitCount).fill('1').join('')).padEnd(this.chunk.length * 8, '0');
+    this.value = parseInt(allBits, 2) & parseInt(mask, 2);
+  }
+
+  setValue(value: number) {
+    if (value > parseInt(new Array(this.bitCount).fill('1').join(''), 2) || value < 0) return;
+    this.value = value;
+  }
+
+  getValue() { return this.value }
+}
+
+/**
+ * a pointer creates and references another node
+ * based upon a given type
+ *
+ * @export
+ * @class Pointer
+ */
 export class Pointer {
   protected position: number;
-  protected references: TypeNode | RawType | Pointer | BitField;
+  protected parent: TypeNode;
+  protected reference: TypeNode;
+  protected value: number;
+
+  constructor({parent, position, reference, buf}: {parent: TypeNode, position: number, reference: TypeNodes, buf: Buffer}) {
+    this.parent = parent;
+    this.position = position;
+    this.value = parseInt([...buf].map(num => num.toString(16).padStart(2, '0')).join(''), 16);
+    this.reference = NodeFactory(reference, {root: this.parent.root, position: this.position + this.value, referenced: this});
+  }
 }
