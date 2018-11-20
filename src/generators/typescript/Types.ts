@@ -328,6 +328,7 @@ export interface IBitFieldArgs {
   subPosition: number;
   bitCount: number;
   chunk: number[];
+  endian: Endian;
 }
 
 /**
@@ -345,12 +346,14 @@ export class BitField {
   protected chunk: number[];
   protected value: number;
 
-  constructor({parent, position, subPosition, bitCount, chunk}: IBitFieldArgs) {
+  constructor({parent, position, subPosition, bitCount, chunk, endian}: IBitFieldArgs) {
     this.parent = parent;
     this.position = position;
     this.subPosition = subPosition;
     this.bitCount = bitCount;
     this.chunk = chunk;
+
+    if (endian === Endian.LITTLE) chunk = chunk.reverse();
 
     let allBits = this.chunk.map(num => num.toString(2).padStart(8, '0')).join('');
     let mask = (new Array(this.subPosition).fill('0').join('') + new Array(this.bitCount).fill('1').join('')).padEnd(this.chunk.length * 8, '0');
@@ -378,10 +381,14 @@ export class Pointer {
   protected reference: TypeNode;
   protected value: number;
 
-  constructor({parent, position, reference, buf}: {parent: TypeNode, position: number, reference: TypeNodes, buf: Buffer}) {
+  constructor({parent, position, reference, buf, endian}: {parent: TypeNode, position: number, reference: TypeNodes, buf: Buffer, endian: Endian}) {
     this.parent = parent;
     this.position = position;
-    this.value = parseInt([...buf].map(num => num.toString(16).padStart(2, '0')).join(''), 16);
+
+    let arr: number[];
+    if (endian === Endian.LITTLE) arr = [...buf].reverse();
+    else arr = [...buf];
+    this.value = parseInt(arr.map(num => num.toString(16).padStart(2, '0')).join(''), 16);
     this.reference = NodeFactory(reference, {root: this.parent.root, position: this.position + this.value, referenced: this});
   }
 }
