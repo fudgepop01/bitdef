@@ -9,7 +9,7 @@ enum RefType {
 }
 
 seq BinTag {
-  char[4] tag
+  char tag[4]
 }
 
 seq ruint {

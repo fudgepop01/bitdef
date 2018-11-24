@@ -1,0 +1,390 @@
+[
+  {
+    "enums": [
+      {
+        "name": "Endian",
+        "pairs": [
+          "0xFEFF",
+          "Big",
+          "0xFFFE",
+          "Little"
+        ]
+      },
+      {
+        "name": "RefType",
+        "pairs": [
+          "0",
+          "Address",
+          "1",
+          "Offset"
+        ]
+      }
+    ],
+    "sequences": [
+      {
+        "name": "BinTag",
+        "entries": [
+          {
+            "type": {
+              "raw": true,
+              "value": "char"
+            },
+            "identifier": "tag",
+            "count": "4"
+          }
+        ]
+      },
+      {
+        "name": "ruint",
+        "entries": [
+          {
+            "type": {
+              "raw": true,
+              "value": "i8"
+            },
+            "cast": "RefType",
+            "identifier": "refType"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i8"
+            },
+            "identifier": "dataType"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "u16b"
+            },
+            "identifier": "reserved"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "dataOffset"
+          }
+        ]
+      },
+      {
+        "name": "NW4RCommonHeader",
+        "entries": [
+          {
+            "type": {
+              "raw": false,
+              "value": "BinTag"
+            },
+            "identifier": "tag"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "u16b"
+            },
+            "cast": "Endian",
+            "identifier": "endian"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "u16b"
+            },
+            "identifier": "version"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "length"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "u16b"
+            },
+            "identifier": "firstOffset"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "u16b"
+            },
+            "identifier": "numEntries"
+          }
+        ]
+      },
+      {
+        "name": "RSTMHeader",
+        "entries": [
+          {
+            "type": {
+              "raw": false,
+              "value": "NW4RCommonHeader"
+            },
+            "identifier": "header"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "headOffset"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "headLength"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "adpcOffset"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "adpcLength"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "dataOffset"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "dataLength"
+          }
+        ]
+      },
+      {
+        "name": "HEADHeader",
+        "entries": [
+          {
+            "type": {
+              "raw": true,
+              "value": "u32b"
+            },
+            "identifier": "tag"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "size"
+          },
+          {
+            "type": {
+              "raw": false,
+              "value": "ruint"
+            },
+            "identifier": "entries",
+            "count": "3"
+          }
+        ]
+      },
+      {
+        "name": "StrmDataInfo",
+        "entries": [
+          {
+            "type": {
+              "raw": false,
+              "value": "AudioFormatInfo"
+            },
+            "identifier": "format"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "u16b"
+            },
+            "identifier": "sampleRate"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "u16b"
+            },
+            "identifier": "blockHeaderOffset"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "loopStartSample"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "numSamples"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "dataOffset"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "numBlocks"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "blockSize"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "samplesPerBlock"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "lastBlockSize"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "lastBlockSamples"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "lastBlockTotal"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "dataInterval"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "bitsPerSample"
+          }
+        ]
+      },
+      {
+        "name": "ADPCHeader",
+        "entries": [
+          {
+            "type": {
+              "raw": true,
+              "value": "u32l"
+            },
+            "identifier": "tag"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "length"
+          }
+        ]
+      },
+      {
+        "name": "RSTMDATAHeader",
+        "entries": [
+          {
+            "type": {
+              "raw": true,
+              "value": "u32l"
+            },
+            "identifier": "tag"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "length"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32b"
+            },
+            "identifier": "dataOffset"
+          },
+          {
+            "type": {
+              "raw": true,
+              "value": "i32l"
+            },
+            "identifier": "pad1"
+          }
+        ]
+      },
+      {
+        "name": "RSTM",
+        "entries": [
+          {
+            "type": {
+              "raw": false,
+              "value": "RSTMHeader"
+            },
+            "identifier": "mainHeader"
+          },
+          {
+            "type": {
+              "raw": false,
+              "value": "HEADHeader"
+            },
+            "identifier": "headHeader"
+          },
+          {
+            "type": {
+              "raw": false,
+              "value": "ADPCHeader"
+            },
+            "identifier": "adpcHeader"
+          },
+          {
+            "type": {
+              "raw": false,
+              "value": "RSTMDATAHeader"
+            },
+            "identifier": "dataHeader"
+          }
+        ]
+      }
+    ]
+  }
+]

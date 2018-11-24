@@ -14,13 +14,6 @@ seq HEADHeader {
   u32b tag
   i32b size
   ruint entries[3]
-
-get:
-  StrmDataInfo Part1 { ret entries[0] }
-  ruint Part2 { ret entries[1] } // unsure what this is (ADPC block flags?)
-  ruint Part3 { ret entries[2] } // ADPCMInfo array, one for each channel?
-  ADPCMInfo[] ChannelInfo {
-  }
 }
 
 seq StrmDataInfo {
@@ -40,10 +33,22 @@ seq StrmDataInfo {
   i32b bitsPerSample
 }
 
+seq ADPCHeader {
+  u32l tag
+  i32b length
+}
+
+seq RSTMDATAHeader {
+  u32l tag
+  i32b length
+  i32b dataOffset
+  i32l pad1
+}
+
 seq RSTM {
   RSTMHeader mainHeader
   HEADHeader headHeader
-
-
+  ADPCHeader adpcHeader
+  RSTMDATAHeader dataHeader
 }
 

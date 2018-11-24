@@ -1,6 +1,7 @@
 import { BigInteger as BI, BigInteger } from "jsbn";
 import { TypeNode } from './TypeNode';
-import { NodeFactory, TypeNodes } from "./NodeFactory";
+import { NodeFactory, TypeNodes } from './NodeFactory';
+import { FileReader } from './FileReader';
 
 export type RawTypes = 'str' | 'dec' | 'flt' ;
 export type byteValues = 8 | 16 | 32 | 64 | 128 | 256 | 512;
@@ -378,17 +379,27 @@ export class BitField {
 export class Pointer {
   protected position: number;
   protected parent: TypeNode;
-  protected reference: TypeNode;
-  protected value: number;
+  protected reference?: TypeNode;
+  protected referenceType: TypeNodes;
+  public value: number;
+  public signed: boolean;
 
-  constructor({parent, position, reference, buf, endian}: {parent: TypeNode, position: number, reference: TypeNodes, buf: Buffer, endian: Endian}) {
+  constructor({parent, position, reference, buf, endian, signed}: {parent: TypeNode, position: number, reference: TypeNodes, buf: Buffer, endian: Endian, signed: boolean}) {
     this.parent = parent;
     this.position = position;
+    this.signed = signed;
 
     let arr: number[];
     if (endian === Endian.LITTLE) arr = [...buf].reverse();
     else arr = [...buf];
-    this.value = parseInt(arr.map(num => num.toString(16).padStart(2, '0')).join(''), 16);
-    this.reference = NodeFactory(reference, {root: this.parent.root, position: this.position + this.value, referenced: this});
+
+    let binString = arr.map(num => num.toString(2).padStart(8, '0')).join('')
+    if (this.signed) this.value = parseInt(binString, 2) - Math.pow(2, arr.length) - 1
+    else this.value = parseInt(binString, 2);
+    this.referenceType = reference;
+  }
+
+  initReference() {
+    this.reference = NodeFactory(this.referenceType, {root: this.parent.root, position: this.position + this.value, referenced: this});
   }
 }

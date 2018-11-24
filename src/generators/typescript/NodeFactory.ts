@@ -3,9 +3,18 @@ import { RawType, BitField, Pointer } from './Types';
 
 
 export enum TypeNodes {
-
+  // <TYPENODES>
 }
 
-export const NodeFactory = (type: TypeNodes, args: ITypeNodeArgs): TypeNode => {
-
+/**
+ * used in pointers to generate the pointer's
+ * target type
+ * @param type which typenode to generate
+ * @param args the args for that typenode
+ */
+export const NodeFactory = (type: TypeNodes, args: ITypeNodeArgs): TypeNode | undefined => {
+  return ({
+    // <TYPENODES_FACTORY>
+    default: () => { return undefined }
+  })[type]();
 }

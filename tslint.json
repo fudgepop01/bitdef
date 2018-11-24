@@ -4,5 +4,11 @@
     "max-classes-per-file": false,
     "object-literal-sort-keys": false,
     "no-conditional-assignment": false,
+    "no-unsafe-any": false,
+    "ordered-imports": false,
+  },
+  "defaultSeverity": "warning",
+  "linterOptions": {
+    "exclude": ["/src/parser.ts"]
   }
 }

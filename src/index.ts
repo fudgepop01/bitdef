@@ -1,7 +1,9 @@
 import * as fs from 'fs';
-import * as moo from 'moo';
 import {promisify} from 'util';
 import * as Path from 'path';
+import * as grammar from './parser';
+import * as nearley from 'nearley';
+
 const readFile = promisify(fs.readFile);
 const readFileSync = fs.readFileSync;
 
@@ -28,44 +30,32 @@ const consolidate = async (path: string) => {
   return replacer(path);
 }
 
-
+const clean = (thing: any, target: string, filteredArr: any[]): undefined | any[] => {
+  if (Array.isArray(thing)) {
+    filteredArr.push(thing.reduce((filtered, value) => clean(value, target, filtered), []))
+    return filteredArr;
+  }
+  else if (thing && typeof thing === "object") {
+    filteredArr.push(thing[target])
+    return filteredArr;
+  }
+  else return filteredArr;
+}
 
 const generate = async () => {
-  let input = await consolidate(`${__dirname}/bitdef-tests/firstPass.bdef`);
+  let input = await consolidate(`${__dirname}/bitdef-brawllib/RSTM.bdef`);
 
-  const mainOut: string = await readFile(`${__dirname}/generators/typescript/index.ts`, 'utf8');
+  const outFile: string = `${__dirname}/../out/out.json`;
+  const outValueFile: string = `${__dirname}/../out/outValues.json`;
 
-  const lexMain = moo.compile({
-    WS: /[ \t]+/,
-    comment: /\/\/.*?$/,
-    number: /0|[1-9][0-9]*/,
-    lcurly: '{',
-    rcurly: '}',
-    lsquare: '[',
-    rsquare: ']',
-    colon: ':',
-    integer: /[iu](?:8|(?:16|24|32|40|48)[bl])/,
-    bitfield: /b[1-8]/,
-    float: /f(?:16|32|64|128)[bl]/,
-    char: 'char',
-    keywords: ['seq', 'enum', 'get', 'set', 'ref'],
-    NL: { match: /\n/, lineBreaks: true, value(str) {return '\\n'} },
-    identifier: /[A-Za-z_]+[0-9A-Za-z_]*/
-  });
+  const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
 
-  lexMain.reset(input);
+  parser.feed(input);
 
-  let out = "";
-  const typesUsed: string[] = [];
-  for (const match of lexMain) {
-    if ( match.type && typesUsed.indexOf(match.value) === -1 && ['char', 'float', 'bitfield', 'integer'].indexOf(match.type) !== -1) {
-      typesUsed.push(match.value);
-    }
-  }
-  console.log(mainOut.replace("// <getters>", typesUsed.sort().map(type => {
-    return `get ${type}() { return new ${type}(this.buffer, this) }`;
-  }).join('\n  ')));
+  let cleaned = clean(parser.results, "value", []);
 
+  fs.writeFileSync(outFile, JSON.stringify(parser.results, null, 2), 'utf8');
+  fs.writeFileSync(outValueFile, JSON.stringify(cleaned, null, 2), 'utf8');
 }
 
 generate();
