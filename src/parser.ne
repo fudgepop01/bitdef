@@ -44,16 +44,17 @@ enumValue -> integerLiteral ":" WS %identifier WS enumValue:? {%
 
 sequence -> "seq" WS %identifier WS "{" WS entry WS "}" {% (values) => sequences.push({name: values[2].value, entries: values[6]}) %}
 
-entry -> (type | %identifier) WS typeCast:? %identifier arrayIdentifier:? (WS entry):? {%
+entry -> ("ref" WS):? (type | %identifier) WS typeCast:? %identifier arrayIdentifier:? (WS entry):? {%
   values => {
     const out = {};
-    out["type"] = (typeof values[0][0] === "string") ? {raw: true, value: values[0][0] } : {raw: false, value: values[0][0].value};
-    if (values[2]) out["cast"] = values[2];
-    out["identifier"] = values[3].value;
-    if (values[4]) out["count"] = values[4];
+    out["ref"] = values[0] !== null;
+    out["type"] = (typeof values[1][0] === "string") ? {raw: true, value: values[1][0] } : {raw: false, value: values[1][0].value};
+    if (values[3]) out["cast"] = values[3];
+    out["identifier"] = values[4].value;
+    if (values[5]) out["count"] = values[5];
 
-    if (values[5] && Array.isArray(values[5][1])) return [out, ...values[5][1]]
-    else if (values[5]) return [out, values[5][1]]
+    if (values[6] && Array.isArray(values[6][1])) return [out, ...values[6][1]]
+    else if (values[6]) return [out, values[6][1]]
     else return [out]
   }
 %}

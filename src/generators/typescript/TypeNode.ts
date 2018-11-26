@@ -28,4 +28,8 @@ export class TypeNode {
     this.reader = (reader) ? reader : this.root.reader;
     this.referenced = (referenced) ? referenced : undefined;
   }
+
+  finalize() {
+    if (this.parent) this.parent.progress += this.progress;
+  }
 }

@@ -33,6 +33,13 @@ seq StrmDataInfo {
   i32b bitsPerSample
 }
 
+seq AudioFormatInfo {
+  i8 encoding
+  i8 looped
+  i8 channels
+  i8 sampleRate24
+}
+
 seq ADPCHeader {
   u32l tag
   i32b length
@@ -47,6 +54,7 @@ seq RSTMDATAHeader {
 
 seq RSTM {
   RSTMHeader mainHeader
+  i8 padding[0x18]
   HEADHeader headHeader
   ADPCHeader adpcHeader
   RSTMDATAHeader dataHeader

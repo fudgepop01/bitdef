@@ -80,25 +80,29 @@ export var ParserRules: NearleyRule[] = [
         }
         },
     {"name": "sequence", "symbols": [{"literal":"seq"}, "WS", (lexMain.has("identifier") ? {type: "identifier"} : identifier), "WS", {"literal":"{"}, "WS", "entry", "WS", {"literal":"}"}], "postprocess": (values) => sequences.push({name: values[2].value, entries: values[6]})},
+    {"name": "entry$ebnf$1$subexpression$1", "symbols": [{"literal":"ref"}, "WS"]},
+    {"name": "entry$ebnf$1", "symbols": ["entry$ebnf$1$subexpression$1"], "postprocess": id},
+    {"name": "entry$ebnf$1", "symbols": [], "postprocess": () => null},
     {"name": "entry$subexpression$1", "symbols": ["type"]},
     {"name": "entry$subexpression$1", "symbols": [(lexMain.has("identifier") ? {type: "identifier"} : identifier)]},
-    {"name": "entry$ebnf$1", "symbols": ["typeCast"], "postprocess": id},
-    {"name": "entry$ebnf$1", "symbols": [], "postprocess": () => null},
-    {"name": "entry$ebnf$2", "symbols": ["arrayIdentifier"], "postprocess": id},
+    {"name": "entry$ebnf$2", "symbols": ["typeCast"], "postprocess": id},
     {"name": "entry$ebnf$2", "symbols": [], "postprocess": () => null},
-    {"name": "entry$ebnf$3$subexpression$1", "symbols": ["WS", "entry"]},
-    {"name": "entry$ebnf$3", "symbols": ["entry$ebnf$3$subexpression$1"], "postprocess": id},
+    {"name": "entry$ebnf$3", "symbols": ["arrayIdentifier"], "postprocess": id},
     {"name": "entry$ebnf$3", "symbols": [], "postprocess": () => null},
-    {"name": "entry", "symbols": ["entry$subexpression$1", "WS", "entry$ebnf$1", (lexMain.has("identifier") ? {type: "identifier"} : identifier), "entry$ebnf$2", "entry$ebnf$3"], "postprocess": 
+    {"name": "entry$ebnf$4$subexpression$1", "symbols": ["WS", "entry"]},
+    {"name": "entry$ebnf$4", "symbols": ["entry$ebnf$4$subexpression$1"], "postprocess": id},
+    {"name": "entry$ebnf$4", "symbols": [], "postprocess": () => null},
+    {"name": "entry", "symbols": ["entry$ebnf$1", "entry$subexpression$1", "WS", "entry$ebnf$2", (lexMain.has("identifier") ? {type: "identifier"} : identifier), "entry$ebnf$3", "entry$ebnf$4"], "postprocess": 
         values => {
           const out = {};
-          out["type"] = (typeof values[0][0] === "string") ? {raw: true, value: values[0][0] } : {raw: false, value: values[0][0].value};
-          if (values[2]) out["cast"] = values[2];
-          out["identifier"] = values[3].value;
-          if (values[4]) out["count"] = values[4];
+          out["ref"] = values[0] !== null;
+          out["type"] = (typeof values[1][0] === "string") ? {raw: true, value: values[1][0] } : {raw: false, value: values[1][0].value};
+          if (values[3]) out["cast"] = values[3];
+          out["identifier"] = values[4].value;
+          if (values[5]) out["count"] = values[5];
         
-          if (values[5] && Array.isArray(values[5][1])) return [out, ...values[5][1]]
-          else if (values[5]) return [out, values[5][1]]
+          if (values[6] && Array.isArray(values[6][1])) return [out, ...values[6][1]]
+          else if (values[6]) return [out, values[6][1]]
           else return [out]
         }
         },

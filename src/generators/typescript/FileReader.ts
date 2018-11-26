@@ -32,6 +32,7 @@ export class FileReader {
   // #region factory methods
   getRawType (adjustment: number, parent: TypeNode, endian: Endian, kind: IRawTypeArgs['kind'], signed: boolean) {
     this.position += adjustment;
+    parent.progress += adjustment;
     return new RawType({kind, buffer: this.buffer.slice(this.position - adjustment, this.position), parent, endian, signed, position: this.position - adjustment});
   }
 

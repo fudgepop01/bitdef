@@ -1,5 +1,6 @@
 # ts lib output
 /lib
+/out
 
 # Logs
 logs
