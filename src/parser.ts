@@ -33,11 +33,21 @@ const lexMain = moo.compile({
     float: /f(?:16|32|64|128)[bl]/,
     char: 'char',
     NL: { match: /\n/, lineBreaks: true },
-    identifier: /[A-Za-z_]+[0-9A-Za-z_]*/
+    identifier: /[A-Za-z_]+[0-9A-Za-z_]*/,
+    func: '$',
+    dot: '.'
   });
 
 const enums: any[] = [];
 const sequences: any[] = [];
+const structures: any[] = [];
+
+// helper function
+const flatten = (arr) => {
+  return arr.reduce(function (flat, toFlatten) {
+    return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+  }, []);
+}
 
 export interface Token { value: any; [key: string]: any };
 
@@ -62,13 +72,15 @@ export var Lexer: Lexer | undefined = lexMain;
 export var ParserRules: NearleyRule[] = [
     {"name": "main$ebnf$1$subexpression$1", "symbols": ["enum"]},
     {"name": "main$ebnf$1$subexpression$1", "symbols": ["sequence"]},
+    {"name": "main$ebnf$1$subexpression$1", "symbols": ["structure"]},
     {"name": "main$ebnf$1", "symbols": ["main$ebnf$1$subexpression$1"]},
     {"name": "main$ebnf$1$subexpression$2", "symbols": ["enum"]},
     {"name": "main$ebnf$1$subexpression$2", "symbols": ["sequence"]},
+    {"name": "main$ebnf$1$subexpression$2", "symbols": ["structure"]},
     {"name": "main$ebnf$1", "symbols": ["main$ebnf$1", "main$ebnf$1$subexpression$2"], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "main$ebnf$2", "symbols": ["main"], "postprocess": id},
     {"name": "main$ebnf$2", "symbols": [], "postprocess": () => null},
-    {"name": "main", "symbols": ["main$ebnf$1", "WS", "main$ebnf$2"], "postprocess": thing => { return { enums, sequences } }},
+    {"name": "main", "symbols": ["main$ebnf$1", "WS", "main$ebnf$2"], "postprocess": thing => { return { enums, sequences, structures } }},
     {"name": "enum", "symbols": [{"literal":"enum"}, "WS", (lexMain.has("identifier") ? {type: "identifier"} : identifier), "WS", {"literal":"{"}, "WS", "enumValue", {"literal":"}"}], "postprocess": (values) => enums.push({name: values[2].value, pairs: values[6]})},
     {"name": "enumValue$ebnf$1", "symbols": ["enumValue"], "postprocess": id},
     {"name": "enumValue$ebnf$1", "symbols": [], "postprocess": () => null},
@@ -79,7 +91,24 @@ export var ParserRules: NearleyRule[] = [
           return out;
         }
         },
-    {"name": "sequence", "symbols": [{"literal":"seq"}, "WS", (lexMain.has("identifier") ? {type: "identifier"} : identifier), "WS", {"literal":"{"}, "WS", "entry", "WS", {"literal":"}"}], "postprocess": (values) => sequences.push({name: values[2].value, entries: values[6]})},
+    {"name": "sequence$ebnf$1", "symbols": []},
+    {"name": "sequence$ebnf$1$subexpression$1", "symbols": ["entry", "WS"]},
+    {"name": "sequence$ebnf$1", "symbols": ["sequence$ebnf$1", "sequence$ebnf$1$subexpression$1"], "postprocess": (d) => d[0].concat([d[1]])},
+    {"name": "sequence", "symbols": [{"literal":"seq"}, "WS", (lexMain.has("identifier") ? {type: "identifier"} : identifier), "WS", {"literal":"{"}, "WS", "sequence$ebnf$1", {"literal":"}"}], "postprocess": (values) => sequences.push({name: values[2].value, entries: values[6].map(val => val[0])})},
+    {"name": "structure$ebnf$1$subexpression$1$subexpression$1", "symbols": ["func"]},
+    {"name": "structure$ebnf$1$subexpression$1$subexpression$1", "symbols": ["entry"]},
+    {"name": "structure$ebnf$1$subexpression$1", "symbols": ["structure$ebnf$1$subexpression$1$subexpression$1", "WS"]},
+    {"name": "structure$ebnf$1", "symbols": ["structure$ebnf$1$subexpression$1"]},
+    {"name": "structure$ebnf$1$subexpression$2$subexpression$1", "symbols": ["func"]},
+    {"name": "structure$ebnf$1$subexpression$2$subexpression$1", "symbols": ["entry"]},
+    {"name": "structure$ebnf$1$subexpression$2", "symbols": ["structure$ebnf$1$subexpression$2$subexpression$1", "WS"]},
+    {"name": "structure$ebnf$1", "symbols": ["structure$ebnf$1", "structure$ebnf$1$subexpression$2"], "postprocess": (d) => d[0].concat([d[1]])},
+    {"name": "structure", "symbols": [{"literal":"struct"}, "WS", (lexMain.has("identifier") ? {type: "identifier"} : identifier), "WS", {"literal":"{"}, "WS", "structure$ebnf$1", {"literal":"}"}], "postprocess": (values) => structures.push({name: values[2].value, entries: values[6].map(val => val[0][0])})},
+    {"name": "func", "symbols": [{"literal":"$"}, {"literal":"jump"}, {"literal":"("}, "funcArgs", {"literal":")"}], "postprocess": (values) => {return {blockType: "func", functionName: "jump", arg: values[3]}}},
+    {"name": "funcArgs$ebnf$1", "symbols": []},
+    {"name": "funcArgs$ebnf$1$subexpression$1", "symbols": [{"literal":"."}, (lexMain.has("identifier") ? {type: "identifier"} : identifier)]},
+    {"name": "funcArgs$ebnf$1", "symbols": ["funcArgs$ebnf$1", "funcArgs$ebnf$1$subexpression$1"], "postprocess": (d) => d[0].concat([d[1]])},
+    {"name": "funcArgs", "symbols": [(lexMain.has("identifier") ? {type: "identifier"} : identifier), "funcArgs$ebnf$1"], "postprocess": (values) => flatten(values).map(val => val.value).join('')},
     {"name": "entry$ebnf$1$subexpression$1", "symbols": [{"literal":"ref"}, "WS"]},
     {"name": "entry$ebnf$1", "symbols": ["entry$ebnf$1$subexpression$1"], "postprocess": id},
     {"name": "entry$ebnf$1", "symbols": [], "postprocess": () => null},
@@ -89,21 +118,17 @@ export var ParserRules: NearleyRule[] = [
     {"name": "entry$ebnf$2", "symbols": [], "postprocess": () => null},
     {"name": "entry$ebnf$3", "symbols": ["arrayIdentifier"], "postprocess": id},
     {"name": "entry$ebnf$3", "symbols": [], "postprocess": () => null},
-    {"name": "entry$ebnf$4$subexpression$1", "symbols": ["WS", "entry"]},
-    {"name": "entry$ebnf$4", "symbols": ["entry$ebnf$4$subexpression$1"], "postprocess": id},
-    {"name": "entry$ebnf$4", "symbols": [], "postprocess": () => null},
-    {"name": "entry", "symbols": ["entry$ebnf$1", "entry$subexpression$1", "WS", "entry$ebnf$2", (lexMain.has("identifier") ? {type: "identifier"} : identifier), "entry$ebnf$3", "entry$ebnf$4"], "postprocess": 
+    {"name": "entry", "symbols": ["entry$ebnf$1", "entry$subexpression$1", "WS", "entry$ebnf$2", (lexMain.has("identifier") ? {type: "identifier"} : identifier), "entry$ebnf$3"], "postprocess": 
         values => {
           const out = {};
+          out["blockType"] = "type";
           out["ref"] = values[0] !== null;
           out["type"] = (typeof values[1][0] === "string") ? {raw: true, value: values[1][0] } : {raw: false, value: values[1][0].value};
           if (values[3]) out["cast"] = values[3];
           out["identifier"] = values[4].value;
           if (values[5]) out["count"] = values[5];
         
-          if (values[6] && Array.isArray(values[6][1])) return [out, ...values[6][1]]
-          else if (values[6]) return [out, values[6][1]]
-          else return [out]
+          return out
         }
         },
     {"name": "typeCast", "symbols": [{"literal":"("}, (lexMain.has("identifier") ? {type: "identifier"} : identifier), {"literal":")"}, "WS"], "postprocess": values => values[1].value},

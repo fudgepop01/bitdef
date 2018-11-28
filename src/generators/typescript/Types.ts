@@ -252,6 +252,16 @@ export class RawType {
 
   // #region general
   /**
+     * gets the value based on what kind this is
+     *
+     * @type {string}
+     * @memberof RawType
+     */
+    get numValue(): number {
+      return parseInt(this.value);
+    }
+
+  /**
    * gets the value based on what kind this is
    *
    * @type {string}

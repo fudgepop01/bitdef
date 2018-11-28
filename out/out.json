@@ -25,6 +25,7 @@
         "name": "BinTag",
         "entries": [
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -39,6 +40,7 @@
         "name": "ruint",
         "entries": [
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -48,6 +50,7 @@
             "identifier": "refType"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -56,6 +59,7 @@
             "identifier": "dataType"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -64,6 +68,7 @@
             "identifier": "reserved"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -77,6 +82,7 @@
         "name": "NW4RCommonHeader",
         "entries": [
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": false,
@@ -85,6 +91,7 @@
             "identifier": "tag"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -94,6 +101,7 @@
             "identifier": "endian"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -102,6 +110,7 @@
             "identifier": "version"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -110,6 +119,7 @@
             "identifier": "length"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -118,6 +128,7 @@
             "identifier": "firstOffset"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -131,6 +142,7 @@
         "name": "RSTMHeader",
         "entries": [
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": false,
@@ -139,6 +151,7 @@
             "identifier": "header"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -147,6 +160,7 @@
             "identifier": "headOffset"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -155,6 +169,7 @@
             "identifier": "headLength"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -163,6 +178,7 @@
             "identifier": "adpcOffset"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -171,6 +187,7 @@
             "identifier": "adpcLength"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -179,6 +196,7 @@
             "identifier": "dataOffset"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -192,6 +210,7 @@
         "name": "HEADHeader",
         "entries": [
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -200,6 +219,7 @@
             "identifier": "tag"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -208,6 +228,7 @@
             "identifier": "size"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": false,
@@ -222,6 +243,7 @@
         "name": "StrmDataInfo",
         "entries": [
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": false,
@@ -230,6 +252,7 @@
             "identifier": "format"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -238,6 +261,7 @@
             "identifier": "sampleRate"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -246,6 +270,7 @@
             "identifier": "blockHeaderOffset"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -254,6 +279,7 @@
             "identifier": "loopStartSample"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -262,6 +288,7 @@
             "identifier": "numSamples"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -270,6 +297,7 @@
             "identifier": "dataOffset"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -278,6 +306,7 @@
             "identifier": "numBlocks"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -286,6 +315,7 @@
             "identifier": "blockSize"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -294,6 +324,7 @@
             "identifier": "samplesPerBlock"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -302,6 +333,7 @@
             "identifier": "lastBlockSize"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -310,6 +342,7 @@
             "identifier": "lastBlockSamples"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -318,6 +351,7 @@
             "identifier": "lastBlockTotal"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -326,6 +360,7 @@
             "identifier": "dataInterval"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -339,6 +374,7 @@
         "name": "AudioFormatInfo",
         "entries": [
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -347,6 +383,7 @@
             "identifier": "encoding"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -355,6 +392,7 @@
             "identifier": "looped"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -363,6 +401,7 @@
             "identifier": "channels"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -376,6 +415,7 @@
         "name": "ADPCHeader",
         "entries": [
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -384,6 +424,7 @@
             "identifier": "tag"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -397,6 +438,7 @@
         "name": "RSTMDATAHeader",
         "entries": [
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -405,6 +447,7 @@
             "identifier": "tag"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -413,6 +456,7 @@
             "identifier": "length"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -421,6 +465,7 @@
             "identifier": "dataOffset"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": true,
@@ -429,11 +474,14 @@
             "identifier": "pad1"
           }
         ]
-      },
+      }
+    ],
+    "structures": [
       {
         "name": "RSTM",
         "entries": [
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": false,
@@ -442,15 +490,12 @@
             "identifier": "mainHeader"
           },
           {
-            "ref": false,
-            "type": {
-              "raw": true,
-              "value": "i8"
-            },
-            "identifier": "padding",
-            "count": "0x18"
+            "blockType": "func",
+            "functionName": "jump",
+            "arg": "mainHeader.headOffset"
           },
           {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": false,
@@ -459,6 +504,12 @@
             "identifier": "headHeader"
           },
           {
+            "blockType": "func",
+            "functionName": "jump",
+            "arg": "mainHeader.adpcOffset"
+          },
+          {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": false,
@@ -467,6 +518,12 @@
             "identifier": "adpcHeader"
           },
           {
+            "blockType": "func",
+            "functionName": "jump",
+            "arg": "mainHeader.dataOffset"
+          },
+          {
+            "blockType": "type",
             "ref": false,
             "type": {
               "raw": false,

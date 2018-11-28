@@ -52,11 +52,16 @@ seq RSTMDATAHeader {
   i32l pad1
 }
 
-seq RSTM {
+struct RSTM {
   RSTMHeader mainHeader
-  i8 padding[0x18]
+
+  $jump(mainHeader.headOffset)
   HEADHeader headHeader
+
+  $jump(mainHeader.adpcOffset)
   ADPCHeader adpcHeader
+
+  $jump(mainHeader.dataOffset)
   RSTMDATAHeader dataHeader
 }
 

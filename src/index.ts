@@ -40,54 +40,89 @@ const spreadEnumPairs = (arr: string[]) => {
   return out;
 }
 
+enum blockType {
+  func = "func",
+  type = "type"
+}
+interface functionEntry {
+  blockType: blockType,
+  functionName: string,
+  arg: string
+}
 interface typeEntry {
+  blockType: blockType,
   type: {raw: boolean, value: string},
   identifier: string,
   cast?: string,
   count?: number,
   ref: boolean
 }
-const spreadClassDefinitions = (types: typeEntry[]): string => {
+
+/**
+ * builds the necessary
+ * @param types the list of types to add
+ */
+const spreadClassDefinitions = (types: Array<functionEntry | typeEntry>): string => {
   let out = "";
-  for (const entry of types) {
+  for (let entry of types) {
+    // ensures that this entry is indeed a type entry
+    if (entry.blockType === blockType.func) continue;
+    else entry = entry as typeEntry;
+
     if (entry.ref) out += `public ${entry.identifier}: Pointer;\n`
     else out += `public ${entry.identifier}: ${entry.type.raw ? 'RawType' : entry.type.value}${entry.count && entry.type.value !== 'char' ? "[]" : ''};\n`
   }
   return out
 }
-const spreadClassBuilders = (types: typeEntry[]): string => {
+
+/**
+ * generates the instructions to build this chunk of binary data
+ * @param types the list of instructions to parse this chunk
+ */
+const spreadClassBuilders = (types: Array<functionEntry | typeEntry>): string => {
   let out = "";
 
-  for (const entry of types) {
-    if (entry.type.value === 'char') {
-      if (entry.count && entry.count > 0) out += `$.${entry.identifier} = r.str($, ${entry.count})\n`;
-      else out += `$.${entry.identifier} = r.ntstr($)\n`;
-      continue;
+  for (let entry of types) {
+    // for generating the functions
+    if (entry.blockType === blockType.func) {
+      entry = entry as functionEntry;
+      if (isNaN(parseInt(entry.arg))) out += `r.${entry.functionName}($.${entry.arg}.numValue);\n`
+      else out += `r.${entry.functionName}(${entry.arg})`
+    }
+    // for generating the type creation instructions
+    else if (entry.blockType === blockType.type) {
+      entry = entry as typeEntry;
+      if (entry.type.value === 'char') {
+        if (entry.count && entry.count > 0) out += `$.${entry.identifier} = r.str($, ${entry.count})\n`;
+        else out += `$.${entry.identifier} = r.ntstr($)\n`;
+        continue;
+      }
+
+      if (entry.count) {
+        out += `$.${entry.identifier} = new Array(${entry.count});
+        for (let i = 0; i < ${entry.count}; i++) {`;
+        if (entry.type.raw) out += `$.${entry.identifier}[i] = r.${entry.type.value}($);`
+        else out += `$.${entry.identifier}[i] = new ${entry.type.value}({
+          position: r.position,
+          parent: $,
+          root: $.root,
+          reader: r
+        })`;
+        out += '};\n';
+      }
+      else {
+        if (entry.type.raw) {
+          out += `$.${entry.identifier} = r.${entry.type.value}($)\n`
+        }
+        else out += `$.${entry.identifier} = new ${entry.type.value}({
+          position: r.position,
+          parent: $,
+          root: $.root,
+          reader: r,
+        })\n`;
+      }
     }
 
-    if (entry.count) {
-      out += `$.${entry.identifier} = new Array(${entry.count});
-      for (let i = 0; i < ${entry.count}; i++) {`;
-      if (entry.type.raw) out += `$.${entry.identifier}[i] = r.${entry.type.value}($);`
-      else out += `$.${entry.identifier}[i] = new ${entry.type.value}({
-        position: r.position,
-        parent: $,
-        root: $.root,
-        reader: r
-      })`;
-      out += '};\n';
-    }
-    else {
-      if (entry.type.raw) {
-        out += `$.${entry.identifier} = r.${entry.type.value}($)\n`
-      }
-      else out += `$.${entry.identifier} = new ${entry.type.value}({
-        position: r.position,
-        parent: $,
-        root: $.root,
-        reader: r,
-      })\n`;
-    }
 
   }
 
@@ -109,7 +144,7 @@ const generate = async () => {
     sequences: `
     import { TypeNode, ITypeNodeArgs } from './base/TypeNode';
     import { RawType, BitField, Pointer } from './base/Types';
-    `
+    `,
   }
 
   for (const entry of parsed['enums']) {
@@ -130,6 +165,22 @@ const generate = async () => {
           let r = $.reader;
 
           ${spreadClassBuilders(seq.entries)}
+          $.finalize();
+        }
+      }
+    `
+  }
+
+  for (const struct of parsed['structures']) {
+    out.sequences += `
+      export class ${struct.name} extends TypeNode {
+        ${spreadClassDefinitions(struct.entries)}
+        constructor(args: ITypeNodeArgs) {
+          super(args);
+          let $ = this;
+          let r = $.reader;
+
+          ${spreadClassBuilders(struct.entries)}
           $.finalize();
         }
       }

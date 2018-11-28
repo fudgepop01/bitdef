@@ -21,16 +21,26 @@ const lexMain = moo.compile({
     float: /f(?:16|32|64|128)[bl]/,
     char: 'char',
     NL: { match: /\n/, lineBreaks: true },
-    identifier: /[A-Za-z_]+[0-9A-Za-z_]*/
+    identifier: /[A-Za-z_]+[0-9A-Za-z_]*/,
+    func: '$',
+    dot: '.'
   });
 
 const enums: any[] = [];
 const sequences: any[] = [];
+const structures: any[] = [];
+
+// helper function
+const flatten = (arr) => {
+  return arr.reduce(function (flat, toFlatten) {
+    return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+  }, []);
+}
 %}
 
 @lexer lexMain
 
-main -> (enum | sequence):+ WS main:? {% thing => { return { enums, sequences } }%}
+main -> (enum | sequence | structure):+ WS main:? {% thing => { return { enums, sequences, structures } }%}
 
 enum -> "enum" WS %identifier WS "{" WS enumValue "}" {% (values) => enums.push({name: values[2].value, pairs: values[6]}) %}
 
@@ -42,20 +52,26 @@ enumValue -> integerLiteral ":" WS %identifier WS enumValue:? {%
   }
 %}
 
-sequence -> "seq" WS %identifier WS "{" WS entry WS "}" {% (values) => sequences.push({name: values[2].value, entries: values[6]}) %}
+sequence -> "seq" WS %identifier WS "{" WS (entry WS):* "}" {% (values) => sequences.push({name: values[2].value, entries: values[6].map(val => val[0])}) %}
 
-entry -> ("ref" WS):? (type | %identifier) WS typeCast:? %identifier arrayIdentifier:? (WS entry):? {%
+structure -> "struct" WS %identifier WS "{" WS ((func | entry) WS):+ "}" {% (values) => structures.push({name: values[2].value, entries: values[6].map(val => val[0][0])}) %}
+
+func -> "$" "jump" "(" funcArgs ")" {% (values) => {return {blockType: "func", functionName: "jump", arg: values[3]}} %}
+
+funcArgs -> %identifier ("." %identifier):* {% (values) => flatten(values).map(val => val.value).join('') %}
+  | integerLiteral
+
+entry -> ("ref" WS):? (type | %identifier) WS typeCast:? %identifier arrayIdentifier:? {%
   values => {
     const out = {};
+    out["blockType"] = "type";
     out["ref"] = values[0] !== null;
     out["type"] = (typeof values[1][0] === "string") ? {raw: true, value: values[1][0] } : {raw: false, value: values[1][0].value};
     if (values[3]) out["cast"] = values[3];
     out["identifier"] = values[4].value;
     if (values[5]) out["count"] = values[5];
 
-    if (values[6] && Array.isArray(values[6][1])) return [out, ...values[6][1]]
-    else if (values[6]) return [out, values[6][1]]
-    else return [out]
+    return out
   }
 %}
 
